@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Show note</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Your note:</h1>
+        <p>If you read the note, it will be irrevocably deleted.</p>
+        <button id="showNoteButton">Show note</button>
+        <textarea id="noteContent" readonly style="display: none;"></textarea>
+        <button id="createNewNote" style="display: none;" onclick="location.href='/';">Create new note</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+    <script>
+        const showNoteButton = document.getElementById('showNoteButton');
+        const noteContent = document.getElementById('noteContent');
+        const createNewNoteButton = document.getElementById('createNewNote');
+
+        function decryptNote(encryptedContent, key) {
+            const bytes = CryptoJS.AES.decrypt(encryptedContent, key);
+            return bytes.toString(CryptoJS.enc.Utf8);
+        }
+
+        showNoteButton.addEventListener('click', function() {
+            const hash = window.location.hash.substr(1);
+            const [id, key] = hash.split('_');
+
+            fetch(`/note/${id}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Note could not be loaded.');
+                    }
+                    return response.text();
+                })
+                .then(encryptedContent => {
+                    const content = decryptNote(encryptedContent, key);
+                    noteContent.value = content;
+                    noteContent.style.display = 'block';
+                    showNoteButton.style.display = 'none';
+                    createNewNoteButton.style.display = 'block';
+                    window.history.replaceState(null, null, "read.html");
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    if (error.message === "Note could not be loaded.") {
+                        window.location.href = 'read.html';
+                    } else {
+                        noteContent.value = 'Error loading the note.';
+                        noteContent.style.display = 'block';
+                    }
+                });
+        });
+
+        window.onunload = () => {
+            showNoteButton.removeEventListener('click', fetchAndDisplayNote);
+        };
+    </script>
+</body>
+</html>

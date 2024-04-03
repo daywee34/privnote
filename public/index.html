@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create a encrypted Note</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Create an encrypted note</h1>
+        <textarea id="noteInput" placeholder="Write your note here..."></textarea>
+        <button onclick="createNote()">Create note</button>
+        <div id="message" class="message"></div>
+        <button id="copyLink" style="display: none;">Copy link</button>
+    </div>
+    <script>
+        window.addEventListener('beforeunload', function() {
+            document.getElementById('noteInput').value = '';
+        });
+    </script>    
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

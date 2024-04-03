@@ -1,0 +1,215 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    font-family: 'Arial', sans-serif;
+    background-color: #121212;
+    color: #ffffff;
+    padding: 0;
+    margin: 0;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    width: 100%;
+    max-width: 500px;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #1E1E1E;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+textarea {
+    width: 100%;
+    height: 150px;
+    padding: 15px;
+    background-color: #252525;
+    color: #ffffff;
+    border: 1px solid #333333;
+    border-radius: 4px;
+    resize: none;
+}
+
+button {
+    width: 100%;
+    padding: 10px 0;
+    background-color: #007bff;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    transition: background-color 0.3s;
+    outline: none;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+button:active {
+    transform: translateY(2px);
+}
+
+#message {
+    text-align: center;
+    min-height: 20px;
+}
+
+#copyLink {
+    background-color: #4caf50;
+    display: none;
+    padding: 10px 0;
+    font-size: 16px;
+}
+
+#copyLink:hover {
+    background-color: #388e3c;
+}
+
+#noteInput::placeholder {
+    color: #b1b1b1;
+}
+
+@media (max-width: 600px) {
+    body, html {
+        padding: 20px;
+    }
+
+    .container {
+        padding: 15px;
+    }
+}
+.container {
+    display: flex;
+    flex-direction: column;
+    max-width: 600px;
+    margin: auto;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #1E1E1E;
+    color: #ffffff;
+    gap: 20px;
+}
+
+h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+textarea {
+    width: 100%;
+    height: auto;
+    padding: 20px;
+    background-color: #252525;
+    border: none;
+    border-radius: 4px;
+    color: #ffffff;
+    resize: none;
+    font-family: 'Arial', sans-serif;
+    font-size: 16px;
+    white-space: pre-wrap;
+    overflow: auto;
+}
+
+button {
+    padding: 10px 20px;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: #ffffff;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+p {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #ffcc00;
+}
+
+#showNoteButton {
+    display: block;
+}
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    text-align: center;
+}
+
+.note-destroyed-message h1, .note-destroyed-message p {
+    margin-bottom: 20px;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #121212;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.message-container {
+    max-width: 600px;
+    margin-bottom: 30px;
+    padding: 20px;
+    text-align: center;
+}
+
+h1 {
+    margin-bottom: 10px;
+    font-size: 1.5em;
+}
+
+p {
+    margin-bottom: 20px;
+    font-size: 1em;
+}
+
+.action-container {
+    text-align: center;
+    width: 100%;
+}
+
+.new-note-button {
+    display: inline-block;
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px;
+    text-decoration: none;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.new-note-button:hover {
+    background-color: #0056b3;
+}
