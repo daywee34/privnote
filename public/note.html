@@ -7,8 +7,6 @@
 </head>
 <body>
     <div class="container">
-        <h1>Your note:</h1>
-        <p>If you read the note, it will be irrevocably deleted.</p>
         <button id="showNoteButton">Show note</button>
         <textarea id="noteContent" readonly style="display: none;"></textarea>
         <button id="createNewNote" style="display: none;" onclick="location.href='/';">Create new note</button>
@@ -27,31 +25,34 @@
 
         showNoteButton.addEventListener('click', function() {
             const hash = window.location.hash.substr(1);
-            const [id, key] = hash.split('_');
+            const decodedHash = atob(hash);
+            const [id, key] = decodedHash.split('_');
 
             fetch(`/note/${id}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Note could not be loaded.');
                     }
-                    return response.text();
+                    return response.json();
                 })
-                .then(encryptedContent => {
-                    const content = decryptNote(encryptedContent, key);
-                    noteContent.value = content;
-                    noteContent.style.display = 'block';
-                    showNoteButton.style.display = 'none';
-                    createNewNoteButton.style.display = 'block';
-                    window.history.replaceState(null, null, "read.html");
+                .then(data => {
+                    if (data.message === "Note has already been read.") {
+                        const encodedDate = btoa(data.read_at);
+                        window.location.href = `read.html#${encodedDate}`;
+                    } else {
+                        const content = decryptNote(data.content, key);
+                        noteContent.value = content;
+                        noteContent.style.display = 'block';
+                        showNoteButton.style.display = 'none';
+                        createNewNoteButton.style.display = 'block';
+                        window.history.replaceState(null, null, " ");
+                    }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    if (error.message === "Note could not be loaded.") {
-                        window.location.href = 'read.html';
-                    } else {
-                        noteContent.value = 'Error loading the note.';
-                        noteContent.style.display = 'block';
-                    }
+                    const currentDateTime = new Date().toISOString();
+                    const encodedDateTime = btoa(currentDateTime);
+                    window.location.href = `read.html#${encodedDateTime}`;
                 });
         });
 

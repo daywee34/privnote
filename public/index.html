@@ -2,8 +2,90 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Create a encrypted Note</title>
+    <title>Create an Encrypted Note</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            min-height: 100%;
+            font-family: 'Arial', sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 50px;
+        }
+        .container {
+            width: 90%;
+            max-width: 700px;
+            margin: auto;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #1E1E1E;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+        h1 { text-align: center; margin-bottom: 20px; }
+        textarea {
+            width: 100%;
+            padding: 15px;
+            background-color: #252525;
+            border: 1px solid #333333;
+            border-radius: 4px;
+            color: #ffffff;
+            resize: none;
+            min-height: 150px;
+        }
+        button {
+            width: 100%;
+            padding: 10px 0;
+            background-color: #007bff;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: background-color 0.3s;
+            outline: none;
+        }
+        button:hover { background-color: #0056b3; }
+        button:active { transform: translateY(2px); }
+        #message { text-align: center; min-height: 20px; }
+        #copyLink {
+            background-color: #4caf50;
+            display: none;
+            padding: 10px 0;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        #copyLink:hover { background-color: #388e3c; }
+        .privacy-policy {
+            margin-top: 30px;
+            background-color: #252525;
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        @media (max-width: 600px) {
+            body, html { padding: 20px; }
+            .container { width: calc(100% - 40px); }
+        }
+        input.textarea {
+            width: 100%;
+            padding: 15px;
+            background-color: #252525;
+            color: #ffffff;
+            border: 1px solid #333333;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -11,15 +93,20 @@
         <textarea id="noteInput" placeholder="Write your note here..."></textarea>
         <button onclick="createNote()">Create note</button>
         <div id="message" class="message"></div>
-        <button id="copyLink" style="display: none;">Copy link</button>
+        <input type="text" id="linkToCopy" class="textarea" style="display: none;" readonly>
+        <button id="copyLink" style="display: none;" onclick="copyToClipboard()">Copy link</button>
+        <div class="privacy-policy">
+            <h2>Privacy Policy</h2>
+            <p>We value your privacy. All notes created are encrypted and are only accessible via the unique link provided after creation. Notes are automatically deleted after they have been read or after 7 days, whichever comes first.</p>
+            <p>No personal data is stored by our service, and all communications are secured with HTTPS.</p>
+        </div>
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+    <script src="script.js"></script>
     <script>
         window.addEventListener('beforeunload', function() {
             document.getElementById('noteInput').value = '';
         });
-    </script>    
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
-    <script src="script.js"></script>
+    </script>
 </body>
 </html>

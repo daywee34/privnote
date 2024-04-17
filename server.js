@@ -3,107 +3,74 @@ const bodyParser = require('body-parser');
 const sqlite3 = require('sqlite3').verbose();
 const crypto = require('crypto');
 const app = express();
-const port = 80;
+const port = 8384;
 
-const db = new sqlite3.Database('./db/notes.db', (err) => {
+const db = new sqlite3.Database('./db/notes.db', sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
     if (err) {
-        console.error(err.message);
+        console.error('Database connection error:', err.message);
         return;
     }
     console.log('Connected to the SQLite database.');
 });
 
-db.run("CREATE TABLE IF NOT EXISTS notes (id TEXT PRIMARY KEY, content TEXT NOT NULL, created_at DATETIME DEFAULT CURRENT_TIMESTAMP)");
+db.run("CREATE TABLE IF NOT EXISTS notes (id TEXT PRIMARY KEY, content TEXT NOT NULL, created_at DATETIME DEFAULT CURRENT_TIMESTAMP, is_read BOOLEAN DEFAULT 0, read_at DATETIME)");
 
 app.use(bodyParser.json());
 app.use(express.static('public'));
 
+function generateUniqueId() {
+    return crypto.randomBytes(16).toString('hex');
+}
+
 app.post('/note', (req, res) => {
-    const { id, content } = req.body;
-    db.get('SELECT id FROM notes WHERE id = ?', [id], (err, row) => {
+    const { content } = req.body;
+    const id = generateUniqueId();
+    db.run('INSERT INTO notes (id, content) VALUES (?, ?)', [id, content], (err) => {
         if (err) {
-            console.error(err.message);
-            res.status(500).send({ message: 'Error checking the note.' });
+            console.error('Error saving the note:', err.message);
+            res.status(500).send({ message: 'Error saving the note.' });
             return;
         }
-        if (row) {
-            res.status(400).send({ message: 'A note with the same ID already exists.' });
-        } else {
-            db.run('INSERT INTO notes (id, content) VALUES (?, ?)', [id, content], (err) => {
-                if (err) {
-                    console.error(err.message);
-                    res.status(500).send({ message: 'Error saving the note.' });
-                    return;
-                }
-                res.status(201).send({ message: 'Note saved.' });
-            });
-        }
+        res.status(201).send({ id, message: 'Note saved.' });
     });
 });
 
-function overwriteAndDeleteNote(id) {
-    const overwriteTimes = 3;
-    let promise = Promise.resolve();
-
-    for (let i = 0; i < overwriteTimes; i++) {
-        promise = promise.then(() => new Promise((resolve, reject) => {
-            const randomString = crypto.randomBytes(64).toString('hex');
-            db.run('UPDATE notes SET content = ? WHERE id = ?', [randomString, id], err => {
-                if (err) {
-                    console.error('Error overwriting the note:', err.message);
-                    reject(err);
-                } else {
-                    resolve();
-                }
-            });
-        }));
-    }
-
-    promise.then(() => {
-        db.run('DELETE FROM notes WHERE id = ?', id, err => {
-            if (err) {
-                console.error('Error deleting the note:', err.message);
-            }
-        });
-    }).catch(err => console.error('An error occurred:', err));
-}
-
 app.get('/note/:id', (req, res) => {
     const { id } = req.params;
-    db.get('SELECT content FROM notes WHERE id = ?', [id], (err, row) => {
+    db.get('SELECT content, is_read, read_at FROM notes WHERE id = ?', [id], (err, row) => {
         if (err) {
             console.error('Error retrieving the note:', err.message);
             res.status(500).send({ message: 'Error retrieving the note.' });
             return;
         }
-        if (row) {
-            res.send(row.content);
-            overwriteAndDeleteNote(id);
-        } else {
+        if (!row) {
             res.status(404).send({ message: 'Note not found.' });
+        } else if (row.is_read) {
+            res.status(200).send({ message: 'Note has already been read.', read_at: row.read_at });
+        } else {
+            res.send({ content: row.content });
+            overwriteAndDeleteNote(id);
         }
     });
 });
 
-function deleteOldNotes() {
-    const daysToKeep = 14;
-    const selectSql = `SELECT id FROM notes WHERE created_at < datetime('now', '-${daysToKeep} days')`;
-
-    db.all(selectSql, [], (err, rows) => {
+async function overwriteAndDeleteNote(id) {
+    const randomData = '';
+    await db.run('UPDATE notes SET content = ?, is_read = 1, read_at = datetime("now") WHERE id = ?', [randomData, id], err => {
         if (err) {
-            console.error(err.message);
-            return;
+            console.error('Error overwriting the note:', err.message);
         }
-
-        rows.forEach(row => {
-            overwriteAndDeleteNote(row.id);
-        });
     });
 }
 
-deleteOldNotes();
-setInterval(deleteOldNotes, 24 * 60 * 60 * 1000);
+setInterval(function () {
+    db.run("DELETE FROM notes WHERE datetime('now') > datetime(created_at, '+7 days')", err => {
+        if (err) {
+            console.error('Error deleting old notes:', err.message);
+        }
+    });
+}, 24 * 60 * 60 * 1000);
 
 app.listen(port, () => {
-    console.log(`Server is running under http://localhost:${port}`);
+    console.log(`Server is running on http://localhost:${port}`);
 });

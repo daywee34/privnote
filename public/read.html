@@ -9,9 +9,46 @@
     <div class="message-container">
         <h1>This note has been destroyed.</h1>
         <p>This means that someone has read the note and the encrypted note content has been irrevocably deleted from our server.</p>
+        <p id="readTime">Read: <span></span> ago</p>
     </div>
     <div class="action-container">
         <a href="/" class="new-note-button">Create a new note</a>
     </div>
+
+    <script>
+        function timeSince(date) {
+            const seconds = Math.floor((new Date() - date) / 1000);
+            let interval = seconds / 31536000;
+
+            if (interval > 1) {
+                return Math.floor(interval) + " years";
+            }
+            interval = seconds / 2592000;
+            if (interval > 1) {
+                return Math.floor(interval) + " months";
+            }
+            interval = seconds / 86400;
+            if (interval > 1) {
+                return Math.floor(interval) + " days";
+            }
+            interval = seconds / 3600;
+            if (interval > 1) {
+                return Math.floor(interval) + " hours";
+            }
+            interval = seconds / 60;
+            if (interval > 1) {
+                return Math.floor(interval) + " minutes";
+            }
+            return Math.floor(seconds) + " seconds";
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const hash = window.location.hash.substr(1);
+            const decodedDate = decodeURIComponent(atob(hash));
+            const readTimeElement = document.getElementById('readTime').querySelector('span');
+            const date = new Date(decodedDate);
+            readTimeElement.textContent = timeSince(date);
+        });
+    </script>
 </body>
 </html>
